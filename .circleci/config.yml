@@ -1,77 +1,77 @@
-version: 2
-jobs:
-    build:
-        working_directory: ~/pyurl
-        docker:
-          - image: circleci/python:3.8
-            environment:
-              PIPENV_VENV_IN_PROJECT: true
-        steps:
-          - checkout
-          - run: sudo chown -R circleci:circleci /usr/local/bin
-          - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
-          - run: echo $USERNAME
-          - run: echo $PASSWORD
-          - run:
-              name: "Preparing Venv..."
-              command: |
-                python -m pip install --upgrade pip
-                sudo pip install setuptools wheel twine
-                pip install -r requirements.txt
-          - run:
-              name: "Linting, Sorting, Formatting, Testing..."
-              command: |
-                bash run.sh
-    
-    build:
-        working_directory: ~/pyurl
-        docker:
-        - image: circleci/python:3.6.8
-            environment:
-            PIPENV_VENV_IN_PROJECT: true
-        steps:
-        - checkout
-        - run: sudo chown -R circleci:circleci /usr/local/bin
-        - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
-        - run: echo $USERNAME
-        - run: echo $PASSWORD
-        - run:
-            name: "Preparing Venv..."
-            command: |
-                python -m pip install --upgrade pip
-                sudo pip install setuptools wheel twine
-                pip install -r requirements.txt
-        - run:
-            name: "Linting, Sorting, Formatting, Testing..."
-            command: |
-                bash run.sh
+version: 2.1
 
-    build:
-        working_directory: ~/pyurl
-        docker:
-            - image: circleci/python:3.7.8
-            environment:
-                PIPENV_VENV_IN_PROJECT: true
+py3.6: &py3.6
+    docker:
+        - image: circleci/python:3.6.8
+        environment:
+            PIPENV_VENV_IN_PROJECT: true
+
+py3.7: &py3.7
+    docker:
+        - image: circleci/python:3.7.7
+        environment:
+            PIPENV_VENV_IN_PROJECT: true
+
+py3.8: &py3.8
+    docker:
+        - image: circleci/python:3.8
+        environment:
+            PIPENV_VENV_IN_PROJECT: true
+
+step_chroot: &chroot
+    - run: sudo chown -R circleci:circleci /usr/local/bin
+    - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+    - run: echo $USERNAME
+    - run: echo $PASSWORD
+
+step_venv_run: &venv_run
+    - run:
+        name: "Preparing Venv..."
+        command: |
+            python -m pip install --upgrade pip
+            sudo pip install setuptools wheel twine
+            pip install -r requirements.txt
+    - run:
+        name: "Linting, Sorting, Formatting, Testing..."
+        command: |
+            bash run.sh
+
+step_build: &build
+    - run:
+        name: "Building & Publishing..."
+        command: |
+            python setup.py install
+            python setup.py sdist bdist_wheel
+            twine check dist/*
+            twine upload dist/*.whl dist/*.tar.gz -u $USERNAME -p $PASSWORD
+
+jobs:
+    python-3.8:
+        <<: *py3.8
         steps:
             - checkout
-            - run: sudo chown -R circleci:circleci /usr/local/bin
-            - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
-            - run: echo $USERNAME
-            - run: echo $PASSWORD
-            - run:
-                name: "Preparing Venv..."
-                command: |
-                python -m pip install --upgrade pip
-                sudo pip install setuptools wheel twine
-                pip install -r requirements.txt
-            - run:
-                name: "Linting, Sorting, Formatting, Testing..."
-                command: |
-                bash run.sh
-            - run:
-                name: "Building & Publishing..."
-                command: |
-                python setup.py install
-                python setup.py sdist bdist_wheel
-                twine check dist/*
-                twine upload dist/*.whl dist/*.tar.gz -u $USERNAME -p $PASSWORD
+            - *chroot
+            - *venv_run
+
+    python-3.6:
+        <<: *py3.6
+        steps:
+            - checkout
+            - *chroot
+            - *venv_run
+
+    python-3.7:
+        <<: *py3.7
+        steps:
+            - checkout
+            - *chroot
+            - *venv_run
+            - *build
+
+workflows:
+    version: 2.1
+    ci:
+        jobs:
+            - python-3.8
+            - python-3.6
+            - python-3.7
