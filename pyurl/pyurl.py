@@ -121,7 +121,7 @@ def open_from_cli(updates: list):
     for update in updates:
         print(f"Opening {update}...")
         if sys.platform.startswith("linux"):
-            run(["xdg-open", update], check=True)
+            run(["xdc-open", update], check=True)
         elif sys.platform.startswith("darwin"):
             run(["open", update], check=True)
         elif sys.platform.startswith("win32"):

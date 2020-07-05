@@ -14,8 +14,6 @@ print(f"==> Found db at {FILE}")
     "a",
     [
         "https://www.bloomberg.com/asia",
-        "https://www.forbes.com/",
-        "https://www.gsmarena.com/",
         "https://pytorch.org/blog/",
         "https://blog.tensorflow.org/",
         "https://www.androidauthority.com/",
@@ -34,7 +32,6 @@ def test_add(a):
     [
         "https://www.bloomberg.com/asia",
         "https://www.forbes.com/",
-        "https://www.gsmarena.com/",
         "https://pytorch.org/blog/",
         "https://blog.tensorflow.org/",
         "https://www.androidauthority.com/",
@@ -71,7 +68,6 @@ def test_no_view():
     [
         "https://www.bloomberg.com/asia",
         "https://www.forbes.com/",
-        "https://www.gsmarena.com/",
         "https://pytorch.org/blog/",
         "https://blog.tensorflow.org/",
         "https://www.androidauthority.com/",
@@ -91,7 +87,6 @@ def test_sync(s):
     [
         "https://www.bloomberg.com/asia",
         "https://www.forbes.com/",
-        "https://www.gsmarena.com/",
         "https://pytorch.org/blog/",
         "https://blog.tensorflow.org/",
         "https://www.androidauthority.com/",
