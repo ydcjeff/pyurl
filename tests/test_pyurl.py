@@ -31,7 +31,6 @@ def test_add(a):
     "a",
     [
         "https://www.bloomberg.com/asia",
-        "https://www.forbes.com/",
         "https://pytorch.org/blog/",
         "https://blog.tensorflow.org/",
         "https://www.androidauthority.com/",
@@ -67,7 +66,6 @@ def test_no_view():
     "s",
     [
         "https://www.bloomberg.com/asia",
-        "https://www.forbes.com/",
         "https://pytorch.org/blog/",
         "https://blog.tensorflow.org/",
         "https://www.androidauthority.com/",
@@ -86,7 +84,6 @@ def test_sync(s):
     "r",
     [
         "https://www.bloomberg.com/asia",
-        "https://www.forbes.com/",
         "https://pytorch.org/blog/",
         "https://blog.tensorflow.org/",
         "https://www.androidauthority.com/",
