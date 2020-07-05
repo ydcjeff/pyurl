@@ -1,0 +1,8 @@
+wheel
+beautifulsoup4
+black
+isort
+flake8
+pytest
+twine
+requests

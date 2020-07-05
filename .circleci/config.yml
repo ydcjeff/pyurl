@@ -1,0 +1,77 @@
+version: 2
+jobs:
+    build:
+        working_directory: ~/pyurl
+        docker:
+          - image: circleci/python:3.8
+            environment:
+              PIPENV_VENV_IN_PROJECT: true
+        steps:
+          - checkout
+          - run: sudo chown -R circleci:circleci /usr/local/bin
+          - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+          - run: echo $USERNAME
+          - run: echo $PASSWORD
+          - run:
+              name: "Preparing Venv..."
+              command: |
+                python -m pip install --upgrade pip
+                sudo pip install setuptools wheel twine
+                pip install -r requirements.txt
+          - run:
+              name: "Linting, Sorting, Formatting, Testing..."
+              command: |
+                bash run.sh
+    
+    build:
+        working_directory: ~/pyurl
+        docker:
+        - image: circleci/python:3.6.8
+            environment:
+            PIPENV_VENV_IN_PROJECT: true
+        steps:
+        - checkout
+        - run: sudo chown -R circleci:circleci /usr/local/bin
+        - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+        - run: echo $USERNAME
+        - run: echo $PASSWORD
+        - run:
+            name: "Preparing Venv..."
+            command: |
+                python -m pip install --upgrade pip
+                sudo pip install setuptools wheel twine
+                pip install -r requirements.txt
+        - run:
+            name: "Linting, Sorting, Formatting, Testing..."
+            command: |
+                bash run.sh
+
+    build:
+        working_directory: ~/pyurl
+        docker:
+            - image: circleci/python:3.7.8
+            environment:
+                PIPENV_VENV_IN_PROJECT: true
+        steps:
+            - checkout
+            - run: sudo chown -R circleci:circleci /usr/local/bin
+            - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+            - run: echo $USERNAME
+            - run: echo $PASSWORD
+            - run:
+                name: "Preparing Venv..."
+                command: |
+                python -m pip install --upgrade pip
+                sudo pip install setuptools wheel twine
+                pip install -r requirements.txt
+            - run:
+                name: "Linting, Sorting, Formatting, Testing..."
+                command: |
+                bash run.sh
+            - run:
+                name: "Building & Publishing..."
+                command: |
+                python setup.py install
+                python setup.py sdist bdist_wheel
+                twine check dist/*
+                twine upload dist/*.whl dist/*.tar.gz -u $USERNAME -p $PASSWORD
