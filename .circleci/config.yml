@@ -1,18 +1,18 @@
 version: 2.1
 
-py3.6: &py3.6
+py36: &py36
     docker:
         - image: circleci/python:3.6.8
         environment:
             PIPENV_VENV_IN_PROJECT: true
 
-py3.7: &py3.7
+py37: &py37
     docker:
         - image: circleci/python:3.7.7
         environment:
             PIPENV_VENV_IN_PROJECT: true
 
-py3.8: &py3.8
+py38: &py38
     docker:
         - image: circleci/python:3.8
         environment:
@@ -46,22 +46,22 @@ step_build: &build
             twine upload dist/*.whl dist/*.tar.gz -u $USERNAME -p $PASSWORD
 
 jobs:
-    python-3.8:
-        <<: *py3.8
+    python-38:
+        <<: *py38
         steps:
             - checkout
             - *chroot
             - *venv_run
 
-    python-3.6:
-        <<: *py3.6
+    python-36:
+        <<: *py36
         steps:
             - checkout
             - *chroot
             - *venv_run
 
-    python-3.7:
-        <<: *py3.7
+    python-37:
+        <<: *py37
         steps:
             - checkout
             - *chroot
@@ -72,6 +72,6 @@ workflows:
     version: 2.1
     ci:
         jobs:
-            - python-3.8
-            - python-3.6
-            - python-3.7
+            - python-38
+            - python-36
+            - python-37
