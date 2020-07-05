@@ -1,4 +1,4 @@
-# PyURL
+# PyURL [![CircleCI](https://circleci.com/gh/ydcjeff/pyurl.svg?style=svg)](https://circleci.com/gh/ydcjeff/pyurl)
 
 PyURL is a CS50x 2020 Final Project. What it does is to let you check if your favourite websites have released/updated new blogs, articles, posts, announcements or releases.
 

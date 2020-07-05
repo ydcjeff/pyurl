@@ -1,71 +1,77 @@
 version: 2.1
 
-py36: &py36
-  docker:
-    - image: circleci/python:3.6.8
-
-py37: &py37
-  docker:
-    - image: circleci/python:3.7.7
-
-py38: &py38
-  docker:
-    - image: circleci/python:3.8
-
-step_chroot: &chroot
-  - run: sudo chown -R circleci:circleci /usr/local/bin
-  - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
-  - run: echo $USERNAME
-  - run: echo $PASSWORD
-
-step_venv_run: &venv_run
-  - run:
-      name: "Preparing Venv..."
-      command: |
-        python -m pip install --upgrade pip
-        sudo pip install setuptools wheel twine
-        pip install -r requirements.txt
-  - run:
-      name: "Linting, Sorting, Formatting, Testing..."
-      command: |
-        bash run.sh
-
-step_build: &build
-  - run:
-      name: "Building & Publishing..."
-      command: |
-        python setup.py install
-        python setup.py sdist bdist_wheel
-        twine check dist/*
-        twine upload dist/*.whl dist/*.tar.gz -u $USERNAME -p $PASSWORD
-
 jobs:
-  python-38:
-    <<: *py38
+  python36:
+    docker:
+      - image: circleci/python:3.6.8
     steps:
       - checkout
-      - *chroot
-      - *venv_run
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.6/site-packages
+      - run: echo $USERNAME
+      - run: echo $PASSWORD
+      - run:
+          name: "Preparing Venv..."
+          command: |
+            python -m pip install --upgrade pip
+            sudo pip install setuptools wheel twine
+            pip install -r requirements.txt
+      - run:
+          name: "Linting, Sorting, Formatting, Testing..."
+          command: |
+            bash run.sh
 
-  python-36:
-    <<: *py36
+  python38:
+    docker:
+      - image: circleci/python:3.8
     steps:
       - checkout
-      - *chroot
-      - *venv_run
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.8/site-packages
+      - run: echo $USERNAME
+      - run: echo $PASSWORD
+      - run:
+          name: "Preparing Venv..."
+          command: |
+            python -m pip install --upgrade pip
+            sudo pip install setuptools wheel twine
+            pip install -r requirements.txt
+      - run:
+          name: "Linting, Sorting, Formatting, Testing..."
+          command: |
+            bash run.sh
 
-  python-37:
-    <<: *py37
+  python37:
+    docker:
+      - image: circleci/python:3.7.7
     steps:
       - checkout
-      - *chroot
-      - *venv_run
-      - *build
+      - run: sudo chown -R circleci:circleci /usr/local/bin
+      - run: sudo chown -R circleci:circleci /usr/local/lib/python3.7/site-packages
+      - run: echo $USERNAME
+      - run: echo $PASSWORD
+      - run:
+          name: "Preparing Venv..."
+          command: |
+            python -m pip install --upgrade pip
+            sudo pip install setuptools wheel twine
+            pip install -r requirements.txt
+      - run:
+          name: "Linting, Sorting, Formatting, Testing..."
+          command: |
+            bash run.sh
+      - run:
+          name: "Building & Publishing..."
+          command: |
+            python setup.py install
+            python setup.py sdist bdist_wheel
+            twine check dist/*
+            twine upload dist/*.whl dist/*.tar.gz -u $USERNAME -p $PASSWORD
 
 workflows:
   version: 2.1
   ci:
     jobs:
-      - python-38
-      - python-36
-      - python-37
+      - python38
+      - python36
+      - python37
