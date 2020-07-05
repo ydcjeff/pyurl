@@ -10,6 +10,35 @@ Here's all what you can do:
 - You can list out the updates you haven't opened yet with `-nv` and open them at once with `-o` if you want
 - You can also remove the url(s) you wish to remove with `-rm [URL(s)]`
 
+## Sample
+
+Adding:
+
+```
+pyurl -a https://pytorch.org/blog,https://blog.tensorflow.org
+```
+
+Syncing:
+
+```
+pyurl -s all -o # or
+pyurl -s all # or
+pyurl -s https://pytorch.org/blog,https://blog.tensorflow.org
+```
+
+Viewing the updates that haven't opened:
+
+```
+pyurl -nv # or
+pyurl -nv -o # to open at once
+```
+
+Removing:
+
+```
+pyurl -rm https://pytorch.org/blog,https://blog.tensorflow.org
+```
+
 ## Requirements
 
 - Python 3.6 or greater
