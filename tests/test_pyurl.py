@@ -1,5 +1,4 @@
 import os
-import sqlite3
 from pathlib import Path
 
 import pytest
@@ -77,7 +76,7 @@ def test_no_view():
 )
 def test_sync(s):
     test_sync_output = sync(s, True)
-    assert test_sync_output == []
+    assert test_sync_output == 0
 
 
 @pytest.mark.parametrize(
@@ -93,9 +92,5 @@ def test_sync(s):
     ],
 )
 def test_remove(r):
-    remove(r)
-    db = sqlite3.connect(FILE)
-    cursor = db.cursor()
-    db_output = cursor.execute("SELECT url_id FROM urls WHERE url=?", (r,))
-    assert isinstance(db_output, sqlite3.Cursor)
-    db.close()
+    test_remove_output = remove(r)
+    assert test_remove_output == 1

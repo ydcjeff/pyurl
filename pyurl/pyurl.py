@@ -3,7 +3,6 @@ import os
 import sqlite3
 import sys
 from pathlib import Path
-from pprint import pprint
 from subprocess import run
 
 import requests
@@ -14,7 +13,7 @@ FILE = os.path.join(str(Path.home()), ".pyurl/pyurl.db")
 
 def __version__():
     """Version info"""
-    return "pyurl – 0.1.0"
+    return "pyurl – 0.1.1"
 
 
 # check FILE path exists or not
@@ -39,27 +38,27 @@ db = sqlite3.connect(FILE)
 cursor = db.cursor()
 
 
-def check(sync_urls: str, cursor: sqlite3.Cursor, db: sqlite3.Connection, status: str):
+def check(sync_urls: list, cursor: sqlite3.Cursor, db: sqlite3.Connection, status: str):
     """Checking update in the back
 
     Args:
-        sync_urls: URL(s) to be checked
+        sync_urls: URL(s) to be checked as a list
         cursor: Cursor object of sqlite3
         db: Connection object of sqlite3
         status: 'viewed' or 'unviewed'
 
     Return:
-        List of update links
+        Set of update links
     """
 
-    links_from_db = []
-    links_fetch = []
     out_updates = []
-    https_updates = []
-    for sync_url in sync_urls.split(","):
+    for sync_url in sync_urls:
+        links_fetch = []
+        links_from_db = []
+        https_updates = []
         sync_url = sync_url.strip("/")
         f_links = fetch(sync_url)  # .split(",")
-        for f_link in f_links:
+        for f_link in set(f_links):
             links_fetch.append(f_link.strip())
 
         db_links = cursor.execute(
@@ -69,8 +68,7 @@ def check(sync_urls: str, cursor: sqlite3.Cursor, db: sqlite3.Connection, status
         for link in db_links:
             links_from_db.append(link[0])
 
-        links_set = set(links_from_db)
-        updates = [x for x in links_fetch if x not in links_set]
+        updates = [x for x in links_fetch if x not in set(links_from_db)]
         url_split = sync_url.split("/")
         for update in updates:
             if sync_url in update:
@@ -93,7 +91,7 @@ def check(sync_urls: str, cursor: sqlite3.Cursor, db: sqlite3.Connection, status
 
         out_updates.extend(https_updates)
 
-    return out_updates
+    return set(out_updates)
 
 
 def fetch(url: str):
@@ -146,8 +144,7 @@ def url_exists(urls: str, p_urls: sqlite3.Cursor):
     match = []
     for p_url in p_urls:
         for url in urls.split(","):
-            url = url.strip("/")
-            if p_url[0] == url:
+            if p_url[0] == url.strip("/"):
                 match.append(url)
 
     return match
@@ -204,30 +201,28 @@ def sync(sync_urls: str, viewing: bool):
         viewing: True or False
 
     Return:
-        List of new links found on the websites
+        Set of new links found on the websites or 0
     """
 
     # db = sqlite3.connect(FILE)
     # cursor = db.cursor()
     status = view(viewing)
     if sync_urls == "all":
-        updates = []
         urls = cursor.execute("SELECT url FROM urls").fetchall()
-        for url in urls:
-            update = check(url[0], cursor, db, status)
-            updates.extend(update)
+        urls_list = ["".join(url) for url in urls]
+        updates = check(urls_list, cursor, db, status)
     else:
-        updates = check(sync_urls, cursor, db, status)
+        updates = check(sync_urls.split(","), cursor, db, status)
 
     if updates:
-        pprint(f"Found new {updates}")
+        print(f"\n==> Found new {updates}", end="\n\n")
         if status == "viewed":
             open_from_cli(updates)
         else:
             print("==> 😎 You can now visit the links you want!")
     else:
-        print("==> No new pages published on your added websites!")
-
+        print("==> No new updates found!")
+        return 0
     # db.close()
 
     return updates
@@ -248,10 +243,13 @@ def remove(urls: str):
             print(f"==> Removing {url}...")
         elif url_id is None:
             print(f"==> `{url}` doesn't exist!")
+            return 0
         else:
             print(f"==> {OSError}")
+            return 0
 
     db.commit()
+    return 1
     # db.close()
 
 
@@ -291,30 +289,27 @@ def no_view(no_viewing: bool, viewing: bool):
     https_no_views = []
     # db = sqlite3.connect(FILE)
     # cursor = db.cursor()
-    no_view_links = cursor.execute(
-        "SELECT link, url_id FROM links WHERE status=?", (status,)
-    )
-    for no_view_link in no_view_links:
-        links.append(no_view_link[0])
-        no_view_urls = cursor.execute(
-            "SELECT url FROM urls WHERE url_id=?", (no_view_link[1],)
-        )
-        for no_view_url in no_view_urls:
-            urls.extend(no_view_url[0].split())
-
-    for url in urls:
-        url_split = url.split("/")
+    urls = cursor.execute(
+        "SELECT url FROM urls JOIN links ON urls.url_id=links.url_id WHERE links.status=?",
+        (status,),
+    ).fetchall()
+    for url in set(urls):
+        links = cursor.execute(
+            "SELECT link FROM links JOIN urls ON urls.url_id=links.url_id WHERE urls.url=? AND links.status=?",
+            (url[0], status),
+        ).fetchall()
+        url_split = url[0].split("/")
         for link in links:
-            if url in link:
-                https_no_views.append(link)
+            if url[0] in link[0]:
+                https_no_views.append(link[0])
             elif len(url_split) > 3:
                 url_split = url_split[:3]
-                https_no_views.append("/".join(url_split) + "/" + link.strip("/"))
+                https_no_views.append("/".join(url_split) + "/" + link[0].strip("/"))
             else:
-                https_no_views.append(url + "/" + link.strip("/"))
+                https_no_views.append(url[0] + "/" + link[0].strip("/"))
 
     if https_no_views:
-        print(f"==> You have not opened {https_no_views} yet!")
+        print(f"\n==> You have not opened {https_no_views} yet!", end="\n\n")
         status = view(viewing)
         if status == "viewed":
             cursor.execute("UPDATE links SET status=?", (status,))
@@ -323,7 +318,7 @@ def no_view(no_viewing: bool, viewing: bool):
         else:
             print("==> 😎 You can now visit the links you want!")
     else:
-        print("==> 🎉 You have read all updates!")
+        print("==> 🎉 All caught up!")
 
     # db.close()
     return 1

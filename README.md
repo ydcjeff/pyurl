@@ -9,6 +9,7 @@ Here's all what you can do:
 - You can open them at once with `-o`
 - You can list out the updates you haven't opened yet with `-nv` and open them at once with `-o` if you want
 - You can also remove the url(s) you wish to remove with `-rm [URL(s)]`
+- You can print out the added urls with `-l`
 
 ## Sample
 
@@ -46,6 +47,7 @@ pyurl -rm https://pytorch.org/blog,https://blog.tensorflow.org
 - requests
 - Beautiful Soup 4
 - SQLite 3
+- lxml
 
 ## Installation
 
@@ -55,7 +57,7 @@ pip install pyurl
 
 ## Usage
 
-You can now use with `pyurl`
+You can now use `pyurl`.
 
 ```
 usage: pyurl <commands> [URL(s)]
