@@ -12,8 +12,8 @@ FILE = os.path.join(str(Path.home()), ".pyurl/pyurl.db")
 
 
 def __version__():
-    """Version info"""
-    return "pyurl – 0.1.1"
+    """Version info."""
+    return "pyurl – 0.1.2"
 
 
 # check FILE path exists or not
@@ -39,7 +39,7 @@ cursor = db.cursor()
 
 
 def check(sync_urls: list, cursor: sqlite3.Cursor, db: sqlite3.Connection, status: str):
-    """Checking update in the back
+    """Checking update in the back.
 
     Args:
         sync_urls: URL(s) to be checked as a list
@@ -95,7 +95,7 @@ def check(sync_urls: list, cursor: sqlite3.Cursor, db: sqlite3.Connection, statu
 
 
 def fetch(url: str):
-    """Fetch the links on the page of the added website
+    """Fetch the links on the page of the added website.
 
     Args:
         url: url of the website to be fetched
@@ -115,23 +115,23 @@ def fetch(url: str):
 
 
 def open_from_cli(updates: list):
-    """Open the links from CLI"""
+    """Open the links from CLI."""
     for update in updates:
         print(f"Opening {update}...")
         if sys.platform.startswith("linux"):
-            run(["xdc-open", update], check=True)
+            run(["/usr/bin/xdc-open", update], check=True)
         elif sys.platform.startswith("darwin"):
-            run(["open", update], check=True)
+            run(["/usr/bin/open", update], check=True)
         elif sys.platform.startswith("win32"):
-            run(["start", update], check=True)
+            run(["/usr/bin/start", update], check=True)
         elif sys.platform.startswith("cygwin"):
-            run(["start", update], check=True)
+            run(["/usr/bin/start", update], check=True)
         else:
             print("==> 😔 Cannot open the links from terminal in your system!")
 
 
 def url_exists(urls: str, p_urls: sqlite3.Cursor):
-    """Check URL(s) already exist(s) or not
+    """Check URL(s) already exist(s) or not.
 
     Args:
         urls: URL(s) from the user input
@@ -155,7 +155,7 @@ def view(viewing: bool):
 
 
 def add(add_urls: str):
-    """Add the url of the website to the db
+    """Add the url of the website to the db.
 
     Args:
         add_urls: url(s) of the website(s) to be added
@@ -170,31 +170,31 @@ def add(add_urls: str):
     p_urls = cursor.execute("SELECT url FROM urls")
     match = url_exists(add_urls, p_urls)
     if match:
-        print(f"==> {match} is already added. You can leave it!")
+        print(f"\n==> {match} is already added. You can leave it!")
         return 0
-    else:
-        for url in add_urls.split(","):
-            url = url.strip("/")
-            links = fetch(url)  # .split(",")
-            url = (url,)
-            cursor.execute("INSERT INTO urls (url) VALUES (?)", url)
+
+    for url in add_urls.split(","):
+        url = url.strip("/")
+        links = fetch(url)  # .split(",")
+        url = (url,)
+        cursor.execute("INSERT INTO urls (url) VALUES (?)", url)
+        db.commit()
+        url_id = cursor.execute("SELECT url_id FROM urls WHERE url=?", url).fetchone()[
+            0
+        ]
+        for link in links:
+            items = (url_id, link.strip(), status)
+            cursor.execute(
+                "INSERT INTO links (url_id, link, status) VALUES (?, ?, ?)", items
+            )
             db.commit()
-            url_id = cursor.execute(
-                "SELECT url_id FROM urls WHERE url=?", url
-            ).fetchone()[0]
-            for link in links:
-                items = (url_id, link.strip(), status)
-                cursor.execute(
-                    "INSERT INTO links (url_id, link, status) VALUES (?, ?, ?)", items
-                )
-                db.commit()
-        # db.close()
-        print("==> 🎉 URL added successfully!")
-        return 1
+    # db.close()
+    print("==> 🎉 URL added successfully!")
+    return 1
 
 
 def sync(sync_urls: str, viewing: bool):
-    """Check for the added websites update status
+    """Check for the added websites update status.
 
     Args:
         sync_urls: url(s) of the website(s) to be synced
@@ -229,7 +229,7 @@ def sync(sync_urls: str, viewing: bool):
 
 
 def remove(urls: str):
-    """Remove the added URL(s)"""
+    """Remove the added URL(s)."""
     # db = sqlite3.connect(FILE)
     # cursor = db.cursor()
     for url in urls.split(","):
@@ -254,7 +254,7 @@ def remove(urls: str):
 
 
 def log(logging: bool):
-    """Print the added URL(s)"""
+    """Print the added URL(s)."""
     if logging:
         # db = sqlite3.connect(FILE)
         # cursor = db.cursor()
@@ -264,12 +264,12 @@ def log(logging: bool):
             print(f"==> {url[0]}")
         # db.close()
         return 1
-    else:
-        return 0
+
+    return 0
 
 
 def no_view(no_viewing: bool, viewing: bool):
-    """Show unviewed links
+    """Show unviewed links.
 
     Args:
         no_viewing: True or False
@@ -390,9 +390,9 @@ def main():
     if no_view_urls is True:
         no_view(no_view_urls, open_urls)
 
-    for i in range(len(URLS)):
-        if URLS[i] is not None:
-            FUNCTIONS[i](URLS[i])
+    for i, url in enumerate(URLS):
+        if url is not None:
+            FUNCTIONS[i](url)
 
 
 if __name__ == "__main__":

@@ -20,6 +20,10 @@ jobs:
           name: "Linting, Sorting, Formatting, Testing..."
           command: |
             bash run.sh
+      - run:
+          name: "Uploading Coverage"
+          command: |
+            codecov
 
   python38:
     docker:
@@ -40,6 +44,10 @@ jobs:
           name: "Linting, Sorting, Formatting, Testing..."
           command: |
             bash run.sh
+      - run:
+          name: "Uploading Coverage"
+          command: |
+            codecov
 
   python37:
     docker:
@@ -61,12 +69,16 @@ jobs:
           command: |
             bash run.sh
       - run:
+          name: "Uploading Coverage"
+          command: |
+            codecov
+      - run:
           name: "Building & Publishing..."
           command: |
             python setup.py install
             python setup.py sdist bdist_wheel
             twine check dist/*
-            twine upload dist/*.whl dist/*.tar.gz -u $USERNAME -p $PASSWORD
+            twine upload dist/* -u $USERNAME -p $PASSWORD
 
 workflows:
   version: 2.1

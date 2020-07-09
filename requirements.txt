@@ -7,3 +7,5 @@ pytest
 twine
 requests
 lxml
+pytest-cov
+codecov

@@ -2,16 +2,16 @@
 
 # sorting imports
 echo 'isort running...'
-isort pyurl/pyurl.py tests/test_pyurl.py
+isort pyurl/* tests/*
 
 # linting
 echo 'flake8 running...'
-flake8 pyurl/pyurl.py tests/test_pyurl.py
+flake8 pyurl/* tests/*
 
 # code formatting
 echo 'black running...'
-black pyurl/pyurl.py tests/test_pyurl.py
+black pyurl/* tests/*
 
 # pytest
 echo 'pytest running...'
-pytest tests/test_pyurl.py
+pytest tests/* --cov=./

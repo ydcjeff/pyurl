@@ -1,12 +1,6 @@
-import os
-from pathlib import Path
-
 import pytest
 
 from pyurl.pyurl import add, log, no_view, remove, sync
-
-FILE = os.path.join(str(Path.home()), ".pyurl/pyurl.db")
-print(f"==> Found db at {FILE}")
 
 
 @pytest.mark.parametrize(
