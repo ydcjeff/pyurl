@@ -1,3 +1,4 @@
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/b28a8e4405b44a6582d6b9c1c7421d3b)](https://app.codacy.com/manual/ydcjeff/pyurl?utm_source=github.com&utm_medium=referral&utm_content=ydcjeff/pyurl&utm_campaign=Badge_Grade_Dashboard)
 # PyURL [![CircleCI](https://circleci.com/gh/ydcjeff/pyurl.svg?style=svg)](https://app.circleci.com/pipelines/github/ydcjeff/pyurl)
 
 PyURL is the CS50x 2020 Final Project. What it does is to let you check if your favourite websites have released/updated new blogs, articles, posts, announcements or releases.
